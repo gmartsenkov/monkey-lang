@@ -8,20 +8,21 @@ mod tests {
         let input = String::from("=+(){},;");
 
         let tests = [
-            token::ASSIGN,
-            token::PLUS,
-            token::LPAREN,
-            token::RPAREN,
-            token::LBRACE,
-            token::RBRACE,
-            token::COMMA,
-            token::SEMICOLON
+            token::new(token::ASSIGN, String::from("=")),
+            token::new(token::PLUS, String::from("+")),
+            token::new(token::LPAREN, String::from("(")),
+            token::new(token::RPAREN, String::from(")")),
+            token::new(token::LBRACE, String::from("{")),
+            token::new(token::RBRACE, String::from("}")),
+            token::new(token::COMMA, String::from(",")),
+            token::new(token::SEMICOLON, String::from(";"))
         ];
 
-        let lexer = new(input);
+        let mut lexer = new(input);
 
-        for &test in tests.iter() {
-            assert_eq!(lexer.next_token(), test);
+        for test in tests.iter() {
+            let token = lexer.next_token();
+            assert_eq!(token.token_type, test.token_type);
         }
     }
 }

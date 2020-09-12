@@ -21,7 +21,12 @@ pub const RBRACE: &str = "}";
 pub const FUNCTION: &str = "FUNCTION";
 pub const LET: &str = "LET";
 
-pub struct Token {
-    token_type : String,
-    literal : String
+#[derive(Debug)]
+pub struct Token<'a> {
+    pub token_type : &'a str,
+    pub literal : String,
+}
+
+pub fn new(token_type : &str, literal : String) -> Token {
+    Token{token_type, literal}
 }
