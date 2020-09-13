@@ -1,3 +1,7 @@
+use monkey_lang::repl;
+
 fn main() {
-    println!("Hello, world!");
+    loop {
+        repl::start(std::io::stdin(), std::io::stdout());
+    }
 }
