@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+use lazy_static::lazy_static;
+
 pub const ILLEGAL: &str = "ILLEGAL";
 pub const EOF: &str = "EOF";
 
@@ -21,6 +24,13 @@ pub const RBRACE: &str = "}";
 pub const FUNCTION: &str = "FUNCTION";
 pub const LET: &str = "LET";
 
+lazy_static! {
+    static ref KEYWORDS : HashMap<&'static str, &'static str> = [
+        ("fn", FUNCTION),
+        ("let", LET)
+    ].iter().cloned().collect();
+}
+
 #[derive(Debug)]
 pub struct Token<'a> {
     pub token_type : &'a str,
@@ -29,4 +39,12 @@ pub struct Token<'a> {
 
 pub fn new(token_type : &str, literal : String) -> Token {
     Token{token_type, literal}
+}
+
+pub fn lookup_identifier(identifier : &str) -> &str {
+    if let Some(v) = KEYWORDS.get(identifier) {
+        return v;
+    }
+
+    IDENT
 }
