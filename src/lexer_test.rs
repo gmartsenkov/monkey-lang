@@ -5,17 +5,53 @@ mod tests {
 
    #[test]
     fn test_next_token() {
-        let input = String::from("=+(){},;");
+        let input = String::from(r#"
+           let five = 5;
+           let ten = 10;
+           let add = fn(x, y) {
+               x + y;
+           };
+           let result = add(five, ten);"#
+        );
 
         let tests = [
-            token::new(token::ASSIGN, String::from("=")),
-            token::new(token::PLUS, String::from("+")),
-            token::new(token::LPAREN, String::from("(")),
-            token::new(token::RPAREN, String::from(")")),
-            token::new(token::LBRACE, String::from("{")),
-            token::new(token::RBRACE, String::from("}")),
-            token::new(token::COMMA, String::from(",")),
-            token::new(token::SEMICOLON, String::from(";"))
+            token::new(token::LET, "let".to_string()),
+            token::new(token::IDENT, "five".to_string()),
+            token::new(token::ASSIGN, "=".to_string()),
+            token::new(token::INT, "5".to_string()),
+            token::new(token::SEMICOLON, ";".to_string()),
+            token::new(token::LET, "let".to_string()),
+            token::new(token::IDENT, "ten".to_string()),
+            token::new(token::ASSIGN, "=".to_string()),
+            token::new(token::INT, "10".to_string()),
+            token::new(token::SEMICOLON, ";".to_string()),
+            token::new(token::LET, "let".to_string()),
+            token::new(token::IDENT, "add".to_string()),
+            token::new(token::ASSIGN, "=".to_string()),
+            token::new(token::FUNCTION, "fn".to_string()),
+            token::new(token::LPAREN, "(".to_string()),
+            token::new(token::IDENT, "x".to_string()),
+            token::new(token::COMMA, ",".to_string()),
+            token::new(token::IDENT, "y".to_string()),
+            token::new(token::RPAREN, ")".to_string()),
+            token::new(token::LBRACE, "{".to_string()),
+            token::new(token::IDENT, "x".to_string()),
+            token::new(token::PLUS, "+".to_string()),
+            token::new(token::IDENT, "y".to_string()),
+            token::new(token::SEMICOLON, ";".to_string()),
+            token::new(token::RBRACE, "}".to_string()),
+            token::new(token::SEMICOLON, ";".to_string()),
+            token::new(token::LET, "let".to_string()),
+            token::new(token::IDENT, "result".to_string()),
+            token::new(token::ASSIGN, "=".to_string()),
+            token::new(token::IDENT, "add".to_string()),
+            token::new(token::LPAREN, "(".to_string()),
+            token::new(token::IDENT, "five".to_string()),
+            token::new(token::COMMA, ",".to_string()),
+            token::new(token::IDENT, "ten".to_string()),
+            token::new(token::RPAREN, ")".to_string()),
+            token::new(token::SEMICOLON, ";".to_string()),
+            token::new(token::EOF, "".to_string())
         ];
 
         let mut lexer = new(input);

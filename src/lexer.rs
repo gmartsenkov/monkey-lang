@@ -16,14 +16,14 @@ pub fn new(input: String) -> Lexer {
 impl Lexer {
     pub fn next_token(&mut self) -> token::Token {
         let token = match self.ch {
-            '=' => token::new(token::ASSIGN, String::from(self.ch)),
-            ';' => token::new(token::SEMICOLON, String::from(self.ch)),
-            '(' => token::new(token::LPAREN, String::from(self.ch)),
-            ')' => token::new(token::RPAREN, String::from(self.ch)),
-            ',' => token::new(token::COMMA, String::from(self.ch)),
-            '+' => token::new(token::PLUS, String::from(self.ch)),
-            '{' => token::new(token::LBRACE, String::from(self.ch)),
-            '}' => token::new(token::RBRACE, String::from(self.ch)),
+            '=' => token::new(token::ASSIGN, self.ch.to_string()),
+            ';' => token::new(token::SEMICOLON, self.ch.to_string()),
+            '(' => token::new(token::LPAREN, self.ch.to_string()),
+            ')' => token::new(token::RPAREN, self.ch.to_string()),
+            ',' => token::new(token::COMMA, self.ch.to_string()),
+            '+' => token::new(token::PLUS, self.ch.to_string()),
+            '{' => token::new(token::LBRACE, self.ch.to_string()),
+            '}' => token::new(token::RBRACE, self.ch.to_string()),
             _ => token::new(token::EOF, String::from("0"))
         };
 
