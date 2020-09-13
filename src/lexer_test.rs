@@ -12,8 +12,15 @@ mod tests {
                x + y;
            };
            let result = add(five, ten);
+
            !-/*5;
-           5 < 10 > 5;"#
+           5 < 10 > 5;
+
+           if (5 < 10) {
+             return true;
+           } else {
+             return false;
+           }"#
         );
 
         let tests = [
@@ -65,6 +72,23 @@ mod tests {
             token::new(token::GT, ">".to_string()),
             token::new(token::INT, "5".to_string()),
             token::new(token::SEMICOLON, ";".to_string()),
+            token::new(token::IF, "if".to_string()),
+            token::new(token::LPAREN, "(".to_string()),
+            token::new(token::INT, "5".to_string()),
+            token::new(token::LT, "<".to_string()),
+            token::new(token::INT, "10".to_string()),
+            token::new(token::RPAREN, ")".to_string()),
+            token::new(token::LBRACE, "{".to_string()),
+            token::new(token::RETURN, "return".to_string()),
+            token::new(token::TRUE, "true".to_string()),
+            token::new(token::SEMICOLON, ";".to_string()),
+            token::new(token::RBRACE, "}".to_string()),
+            token::new(token::ELSE, "else".to_string()),
+            token::new(token::LBRACE, "{".to_string()),
+            token::new(token::RETURN, "return".to_string()),
+            token::new(token::FALSE, "false".to_string()),
+            token::new(token::SEMICOLON, ";".to_string()),
+            token::new(token::RBRACE, "}".to_string()),
             token::new(token::EOF, "".to_string())
         ];
 

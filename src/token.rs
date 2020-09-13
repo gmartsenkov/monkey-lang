@@ -29,11 +29,21 @@ pub const RBRACE: &str = "}";
 // Keywords
 pub const FUNCTION: &str = "FUNCTION";
 pub const LET: &str = "LET";
+pub const IF: &str = "IF";
+pub const RETURN: &str = "RETURN";
+pub const ELSE: &str = "ELSE";
+pub const TRUE: &str = "TRUE";
+pub const FALSE: &str = "FALSE";
 
 lazy_static! {
     static ref KEYWORDS : HashMap<&'static str, &'static str> = [
         ("fn", FUNCTION),
-        ("let", LET)
+        ("let", LET),
+        ("true", TRUE),
+        ("false", FALSE),
+        ("if", IF),
+        ("else", ELSE),
+        ("return", RETURN)
     ].iter().cloned().collect();
 }
 
