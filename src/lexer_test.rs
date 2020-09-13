@@ -11,7 +11,9 @@ mod tests {
            let add = fn(x, y) {
                x + y;
            };
-           let result = add(five, ten);"#
+           let result = add(five, ten);
+           !-/*5;
+           5 < 10 > 5;"#
         );
 
         let tests = [
@@ -50,6 +52,18 @@ mod tests {
             token::new(token::COMMA, ",".to_string()),
             token::new(token::IDENT, "ten".to_string()),
             token::new(token::RPAREN, ")".to_string()),
+            token::new(token::SEMICOLON, ";".to_string()),
+            token::new(token::BANG, "!".to_string()),
+            token::new(token::MINUS, "-".to_string()),
+            token::new(token::SLASH, "/".to_string()),
+            token::new(token::ASTERISK, "*".to_string()),
+            token::new(token::INT, "5".to_string()),
+            token::new(token::SEMICOLON, ";".to_string()),
+            token::new(token::INT, "5".to_string()),
+            token::new(token::LT, "<".to_string()),
+            token::new(token::INT, "10".to_string()),
+            token::new(token::GT, ">".to_string()),
+            token::new(token::INT, "5".to_string()),
             token::new(token::SEMICOLON, ";".to_string()),
             token::new(token::EOF, "".to_string())
         ];
