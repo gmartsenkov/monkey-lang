@@ -20,7 +20,11 @@ mod tests {
              return true;
            } else {
              return false;
-           }"#
+           }
+
+           10 == 10;
+           10 != 9;
+           "#
         );
 
         let tests = [
@@ -89,6 +93,14 @@ mod tests {
             token::new(token::FALSE, "false".to_string()),
             token::new(token::SEMICOLON, ";".to_string()),
             token::new(token::RBRACE, "}".to_string()),
+            token::new(token::INT, "10".to_string()),
+            token::new(token::EQ, "==".to_string()),
+            token::new(token::INT, "10".to_string()),
+            token::new(token::SEMICOLON, ";".to_string()),
+            token::new(token::INT, "10".to_string()),
+            token::new(token::NOT_EQ, "!=".to_string()),
+            token::new(token::INT, "9".to_string()),
+            token::new(token::SEMICOLON, ";".to_string()),
             token::new(token::EOF, "".to_string())
         ];
 

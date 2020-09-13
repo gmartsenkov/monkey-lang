@@ -18,14 +18,30 @@ impl Lexer {
     pub fn next_token(&mut self) -> token::Token {
         self.skip_whitespace();
         let token = match self.ch {
-            '=' => token::new(token::ASSIGN, self.ch.to_string()),
+            '=' => {
+                if self.peek_ahead() == '=' {
+                    let ch = self.ch;
+                    self.read_char();
+                    token::new(token::EQ, ch.to_string() + &self.ch.to_string())
+                } else {
+                    token::new(token::ASSIGN, self.ch.to_string())
+                }
+            },
+            '!' => {
+                if self.peek_ahead() == '=' {
+                    let ch = self.ch;
+                    self.read_char();
+                    token::new(token::NOT_EQ, ch.to_string() + &self.ch.to_string())
+                } else {
+                    token::new(token::BANG, self.ch.to_string())
+                }
+            },
             ';' => token::new(token::SEMICOLON, self.ch.to_string()),
             '(' => token::new(token::LPAREN, self.ch.to_string()),
             ')' => token::new(token::RPAREN, self.ch.to_string()),
             ',' => token::new(token::COMMA, self.ch.to_string()),
             '+' => token::new(token::PLUS, self.ch.to_string()),
             '-' => token::new(token::MINUS, self.ch.to_string()),
-            '!' => token::new(token::BANG, self.ch.to_string()),
             '*' => token::new(token::ASTERISK, self.ch.to_string()),
             '/' => token::new(token::SLASH, self.ch.to_string()),
             '<' => token::new(token::LT, self.ch.to_string()),
@@ -78,6 +94,14 @@ impl Lexer {
         }
 
         self.input.get(position..self.position).unwrap()
+    }
+
+    fn peek_ahead(&self) -> char {
+        if self.read_position >= self.input.len() {
+            return '\0';
+        }
+
+        self.input.chars().nth(self.read_position).unwrap()
     }
 
     fn skip_whitespace(&mut self) {
