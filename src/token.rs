@@ -1,41 +1,43 @@
 use std::collections::HashMap;
 use lazy_static::lazy_static;
 
-pub const ILLEGAL: &str = "ILLEGAL";
-pub const EOF: &str = "EOF";
+pub const ILLEGAL: &Type = "ILLEGAL";
+pub const EOF: &Type = "EOF";
 
 // Identifiers + literals
-pub const IDENT: &str = "IDENT";
-pub const INT: &str = "INT";
+pub const IDENT: &Type = "IDENT";
+pub const INT: &Type = "INT";
 
 // Operators
-pub const ASSIGN: &str = "=";
-pub const PLUS: &str = "+";
-pub const MINUS: &str = "-";
-pub const BANG: &str = "!";
-pub const ASTERISK: &str = "*";
-pub const SLASH: &str = "/";
-pub const LT: &str = "<";
-pub const GT: &str = ">";
-pub const EQ: &str = "==";
-pub const NOT_EQ: &str = "!=";
+pub const ASSIGN: &Type = "=";
+pub const PLUS: &Type = "+";
+pub const MINUS: &Type = "-";
+pub const BANG: &Type = "!";
+pub const ASTERISK: &Type = "*";
+pub const SLASH: &Type = "/";
+pub const LT: &Type = "<";
+pub const GT: &Type = ">";
+pub const EQ: &Type = "==";
+pub const NOT_EQ: &Type = "!=";
 
 // Delimiters
-pub const COMMA: &str = ".";
-pub const SEMICOLON: &str = ";";
-pub const LPAREN: &str = "(";
-pub const RPAREN: &str = ")";
-pub const LBRACE: &str = "{";
-pub const RBRACE: &str = "}";
+pub const COMMA: &Type = ".";
+pub const SEMICOLON: &Type = ";";
+pub const LPAREN: &Type = "(";
+pub const RPAREN: &Type = ")";
+pub const LBRACE: &Type = "{";
+pub const RBRACE: &Type = "}";
 
 // Keywords
-pub const FUNCTION: &str = "FUNCTION";
-pub const LET: &str = "LET";
-pub const IF: &str = "IF";
-pub const RETURN: &str = "RETURN";
-pub const ELSE: &str = "ELSE";
-pub const TRUE: &str = "TRUE";
-pub const FALSE: &str = "FALSE";
+pub const FUNCTION: &Type = "FUNCTION";
+pub const LET: &Type = "LET";
+pub const IF: &Type = "IF";
+pub const RETURN: &Type = "RETURN";
+pub const ELSE: &Type = "ELSE";
+pub const TRUE: &Type = "TRUE";
+pub const FALSE: &Type = "FALSE";
+
+pub type Type = str;
 
 lazy_static! {
     static ref KEYWORDS : HashMap<&'static str, &'static str> = [
@@ -51,11 +53,11 @@ lazy_static! {
 
 #[derive(Debug)]
 pub struct Token<'a> {
-    pub token_type : &'a str,
+    pub token_type : &'a Type,
     pub literal : String,
 }
 
-pub fn new(token_type : &str, literal : String) -> Token {
+pub fn new(token_type : &Type, literal : String) -> Token {
     Token{token_type, literal}
 }
 
