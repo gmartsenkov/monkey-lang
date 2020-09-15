@@ -33,4 +33,27 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn test_return_statement() {
+        let input = r#"
+          return 5;
+          return 10;
+          return 993322;
+        "#;
+
+        let mut lexer = lexer::new(input.to_string());
+        let mut parser = new(&mut lexer);
+
+        let program = parser.parse_program();
+
+        assert_eq!(program.statements.len(), 3);
+
+        for statement in program.statements.iter() {
+            match statement {
+                ast::Statements::ReturnStatement(_) => {},
+                _ => unreachable!()
+            }
+        }
+    }
 }

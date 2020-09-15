@@ -1,7 +1,8 @@
 use crate::token;
 
 pub enum Statements {
-    LetStatement(LetStatement)
+    LetStatement(LetStatement),
+    ReturnStatement(ReturnStatement)
 }
 
 pub enum Expressions {
@@ -23,6 +24,11 @@ pub struct LetStatement {
     // pub value : Expressions
 }
 
+pub struct ReturnStatement {
+    pub token : token::Token,
+    // pub return_value : Expressions
+}
+
 impl LetStatement {
     fn token_literal(&self) -> &str {
         self.token.literal.as_str()
@@ -38,7 +44,8 @@ impl Identifier {
 impl Statements {
     pub fn token_literal(&self) -> &str {
         match self {
-            Statements::LetStatement(i) => i.token.literal.as_str()
+            Statements::LetStatement(i) => i.token.literal.as_str(),
+            Statements::ReturnStatement(i) => i.token.literal.as_str()
         }
     }
 }

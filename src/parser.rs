@@ -38,9 +38,8 @@ impl Parser<'_> {
 
     fn parse_statement(&mut self) -> Option<ast::Statements> {
         match self.current_token.token_type.as_str() {
-            token::LET => {
-                self.parse_let_statement()
-            }
+            token::LET => self.parse_let_statement(),
+            token::RETURN => self.parse_return_statement(),
             _ => None
         }
     }
@@ -71,6 +70,20 @@ impl Parser<'_> {
                 name: identifier
             }
         ))
+    }
+
+    fn parse_return_statement(&mut self) -> Option<ast::Statements> {
+        let statement = ast::ReturnStatement{
+            token: self.current_token.clone()
+        };
+
+        self.next_token();
+
+        while self.current_token.token_type == token::SEMICOLON {
+            self.next_token();
+        }
+
+        Some(ast::Statements::ReturnStatement(statement))
     }
 
     fn next_token(&mut self) {
