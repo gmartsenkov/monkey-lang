@@ -4,13 +4,15 @@ pub struct Parser<'a> {
     lexer : &'a mut lexer::Lexer,
     current_token : token::Token,
     peek_token : token::Token,
+    errors : Vec<String>
 }
 
 pub fn new(lexer : &mut lexer::Lexer) -> Parser {
     let mut parser = Parser{
         lexer: lexer,
         current_token: token::new(token::NULL, "".to_string()),
-        peek_token: token::new(token::NULL, "".to_string())
+        peek_token: token::new(token::NULL, "".to_string()),
+        errors: vec![]
     };
 
     parser.next_token();
@@ -81,6 +83,11 @@ impl Parser<'_> {
             self.next_token();
             return true
         }
+
+        let error = format!("Parser Error: Expected {} but got {}", expected, self.peek_token.token_type);
+
+        println!("{}", &error);
+        self.errors.push(error);
 
         false
     }
