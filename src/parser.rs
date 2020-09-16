@@ -97,11 +97,15 @@ impl Parser<'_> {
     }
 
     fn register_prefix_fn(&mut self, token_type: token::Type, function: PrefixParseFn) {
-        self.prefix_parse_functions.insert(token_type, function).unwrap();
+        self.prefix_parse_functions
+            .insert(token_type, function)
+            .unwrap();
     }
 
     fn register_infix_fn(&mut self, token_type: token::Type, function: InfixParseFn) {
-        self.infix_parse_functions.insert(token_type, function).unwrap();
+        self.infix_parse_functions
+            .insert(token_type, function)
+            .unwrap();
     }
 
     fn next_token(&mut self) {

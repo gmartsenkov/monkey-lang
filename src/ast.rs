@@ -3,6 +3,7 @@ use crate::token;
 pub enum Statements {
     Let(LetStatement),
     Return(ReturnStatement),
+    Expression(ExpressionStatement),
 }
 
 pub enum Expressions {
@@ -29,6 +30,11 @@ pub struct ReturnStatement {
     // pub return_value : Expressions
 }
 
+pub struct ExpressionStatement {
+    pub token: token::Token,
+    pub expression: Expressions,
+}
+
 impl LetStatement {
     fn token_literal(&self) -> &str {
         self.token.literal.as_str()
@@ -42,12 +48,14 @@ impl Identifier {
 }
 
 impl Statements {
-    pub fn token_literal(&self) -> &str {
+    pub fn token_literal(&self) -> String {
         match self {
-            Statements::Let(i) => i.token.literal.as_str(),
-            Statements::Return(i) => i.token.literal.as_str(),
+            Statements::Let(i) => i.token.literal.clone(),
+            Statements::Return(i) => i.token.literal.clone(),
+            Statements::Expression(i) => i.expression.to_string(),
         }
     }
+
     pub fn to_string(&self) -> String {
         match self {
             Statements::Let(s) => format!(
@@ -57,6 +65,7 @@ impl Statements {
                 s.value.to_string()
             ),
             Statements::Return(s) => format!("{};", s.token.literal),
+            Statements::Expression(s) => format!("{}", s.expression.to_string()),
         }
     }
 }
@@ -70,11 +79,11 @@ impl Expressions {
 }
 
 impl Program {
-    fn token_literal(&self) -> &str {
+    fn token_literal(&self) -> String {
         if self.statements.len() > 1 {
             return self.statements[0].token_literal();
         }
-        ""
+        "".to_string()
     }
 
     pub fn to_string(&self) -> String {
