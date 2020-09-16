@@ -9,7 +9,7 @@ const PRODUCT: u8 = 5; // *
 const PREFIX: u8 = 6; // -X or !X
 const CALL: u8 = 7; // myFunction(x)
 
-type PrefixParseFn = fn(&Parser) -> ast::Expressions;
+type PrefixParseFn = fn(&Parser) -> Option<ast::Expressions>;
 type InfixParseFn = fn(ast::Expressions) -> ast::Expressions;
 
 pub struct Parser<'a> {
@@ -32,17 +32,28 @@ pub fn new(lexer: &mut lexer::Lexer) -> Parser {
     };
 
     parser.register_prefix_fn(token::IDENT.to_string(), parse_identifier);
+    parser.register_prefix_fn(token::INT.to_string(), parse_integer_literal);
     parser.next_token();
     parser.next_token();
 
     parser
 }
 
-fn parse_identifier(parser: &Parser) -> ast::Expressions {
-    ast::Expressions::Identifier(ast::Identifier {
+fn parse_identifier(parser: &Parser) -> Option<ast::Expressions> {
+    Some(ast::Expressions::Identifier(ast::Identifier {
         token: parser.current_token.clone(),
         value: parser.current_token.literal.clone(),
-    })
+    }))
+}
+
+fn parse_integer_literal(parser: &Parser) -> Option<ast::Expressions> {
+    if let Ok(v) = parser.current_token.literal.parse::<i64>() {
+        return Some(ast::Expressions::IntegerLiteral(ast::IntegerLiteral {
+            token: parser.current_token.clone(),
+            value: v,
+        }));
+    }
+    None
 }
 
 impl Parser<'_> {
@@ -134,7 +145,7 @@ impl Parser<'_> {
     fn parse_expression(&self, precedence: u8) -> Option<ast::Expressions> {
         let token_type = &self.current_token.token_type;
         if let Some(prefix) = self.prefix_parse_functions.get(token_type) {
-            return Some(prefix(self));
+            return prefix(self);
         }
         None
     }

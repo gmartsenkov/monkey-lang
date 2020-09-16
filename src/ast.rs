@@ -8,6 +8,7 @@ pub enum Statements {
 
 pub enum Expressions {
     Identifier(Identifier),
+    IntegerLiteral(IntegerLiteral),
 }
 
 pub struct Program {
@@ -30,6 +31,11 @@ pub struct ReturnStatement {
     // pub return_value : Expressions
 }
 
+pub struct IntegerLiteral {
+    pub token: token::Token,
+    pub value: i64,
+}
+
 pub struct ExpressionStatement {
     pub token: token::Token,
     pub expression: Expressions,
@@ -42,6 +48,12 @@ impl LetStatement {
 }
 
 impl Identifier {
+    pub fn token_literal(&self) -> &str {
+        self.token.literal.as_str()
+    }
+}
+
+impl IntegerLiteral {
     pub fn token_literal(&self) -> &str {
         self.token.literal.as_str()
     }
@@ -74,6 +86,7 @@ impl Expressions {
     fn to_string(&self) -> String {
         match &self {
             Expressions::Identifier(v) => v.value.clone(),
+            Expressions::IntegerLiteral(v) => v.value.to_string().clone(),
         }
     }
 }
