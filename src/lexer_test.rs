@@ -3,9 +3,10 @@ mod tests {
     use crate::lexer::*;
     use crate::token;
 
-   #[test]
+    #[test]
     fn test_next_token() {
-        let input = String::from(r#"
+        let input = String::from(
+            r#"
            let five = 5;
            let ten = 10;
            let add = fn(x, y) {
@@ -24,7 +25,7 @@ mod tests {
 
            10 == 10;
            10 != 9;
-           "#
+           "#,
         );
 
         let tests = [
@@ -101,7 +102,7 @@ mod tests {
             token::new(token::NOT_EQ, "!=".to_string()),
             token::new(token::INT, "9".to_string()),
             token::new(token::SEMICOLON, ";".to_string()),
-            token::new(token::EOF, "".to_string())
+            token::new(token::EOF, "".to_string()),
         ];
 
         let mut lexer = new(input);

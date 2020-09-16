@@ -1,18 +1,18 @@
-use crate::{token, lexer, ast};
+use crate::{ast, lexer, token};
 
 pub struct Parser<'a> {
-    lexer : &'a mut lexer::Lexer,
-    current_token : token::Token,
-    peek_token : token::Token,
-    errors : Vec<String>
+    lexer: &'a mut lexer::Lexer,
+    current_token: token::Token,
+    peek_token: token::Token,
+    errors: Vec<String>,
 }
 
-pub fn new(lexer : &mut lexer::Lexer) -> Parser {
-    let mut parser = Parser{
+pub fn new(lexer: &mut lexer::Lexer) -> Parser {
+    let mut parser = Parser {
         lexer: lexer,
         current_token: token::new(token::NULL, "".to_string()),
         peek_token: token::new(token::NULL, "".to_string()),
-        errors: vec![]
+        errors: vec![],
     };
 
     parser.next_token();
@@ -23,7 +23,7 @@ pub fn new(lexer : &mut lexer::Lexer) -> Parser {
 
 impl Parser<'_> {
     pub fn parse_program(&mut self) -> ast::Program {
-        let mut program = ast::Program{statements: vec![]};
+        let mut program = ast::Program { statements: vec![] };
 
         while self.current_token.token_type != token::EOF {
             if let Some(statement) = self.parse_statement() {
@@ -40,7 +40,7 @@ impl Parser<'_> {
         match self.current_token.token_type.as_str() {
             token::LET => self.parse_let_statement(),
             token::RETURN => self.parse_return_statement(),
-            _ => None
+            _ => None,
         }
     }
 
@@ -51,9 +51,9 @@ impl Parser<'_> {
             return None;
         }
 
-        let identifier = ast::Identifier{
+        let identifier = ast::Identifier {
             token: self.current_token.clone(),
-            value: self.current_token.literal.clone()
+            value: self.current_token.literal.clone(),
         };
 
         if !self.expect_peek_token(token::ASSIGN.to_string()) {
@@ -64,23 +64,19 @@ impl Parser<'_> {
             self.next_token();
         }
 
-        Some(ast::Statements::Let(
-            ast::LetStatement{
-                token: current_token,
-                name: identifier,
-                value: ast::Expressions::Identifier(
-                    ast::Identifier{
-                        token: token::new(token::IDENT, "".to_string()),
-                        value: "".to_string()
-                    }
-                )
-            }
-        ))
+        Some(ast::Statements::Let(ast::LetStatement {
+            token: current_token,
+            name: identifier,
+            value: ast::Expressions::Identifier(ast::Identifier {
+                token: token::new(token::IDENT, "".to_string()),
+                value: "".to_string(),
+            }),
+        }))
     }
 
     fn parse_return_statement(&mut self) -> Option<ast::Statements> {
-        let statement = ast::ReturnStatement{
-            token: self.current_token.clone()
+        let statement = ast::ReturnStatement {
+            token: self.current_token.clone(),
         };
 
         self.next_token();
@@ -97,13 +93,16 @@ impl Parser<'_> {
         self.peek_token = self.lexer.next_token().clone();
     }
 
-    fn expect_peek_token(&mut self, expected : token::Type) -> bool {
+    fn expect_peek_token(&mut self, expected: token::Type) -> bool {
         if self.peek_token.token_type == expected {
             self.next_token();
-            return true
+            return true;
         }
 
-        let error = format!("Parser Error: Expected {} but got {}", expected, self.peek_token.token_type);
+        let error = format!(
+            "Parser Error: Expected {} but got {}",
+            expected, self.peek_token.token_type
+        );
 
         println!("{}", &error);
         self.errors.push(error);

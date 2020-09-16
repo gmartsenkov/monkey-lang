@@ -2,30 +2,30 @@ use crate::token;
 
 pub enum Statements {
     Let(LetStatement),
-    Return(ReturnStatement)
+    Return(ReturnStatement),
 }
 
 pub enum Expressions {
-    Identifier(Identifier)
+    Identifier(Identifier),
 }
 
 pub struct Program {
-    pub statements : Vec<Statements>
+    pub statements: Vec<Statements>,
 }
 
 pub struct Identifier {
-    pub token : token::Token,
-    pub value : String
+    pub token: token::Token,
+    pub value: String,
 }
 
 pub struct LetStatement {
-    pub token : token::Token,
-    pub name : Identifier,
-    pub value : Expressions
+    pub token: token::Token,
+    pub name: Identifier,
+    pub value: Expressions,
 }
 
 pub struct ReturnStatement {
-    pub token : token::Token,
+    pub token: token::Token,
     // pub return_value : Expressions
 }
 
@@ -45,22 +45,18 @@ impl Statements {
     pub fn token_literal(&self) -> &str {
         match self {
             Statements::Let(i) => i.token.literal.as_str(),
-            Statements::Return(i) => i.token.literal.as_str()
+            Statements::Return(i) => i.token.literal.as_str(),
         }
     }
     pub fn to_string(&self) -> String {
         match self {
-            Statements::Let(s) => {
-                format!(
-                    "{} {} = {};",
-                    s.token_literal(),
-                    s.name.token_literal(),
-                    s.value.to_string()
-                )
-            },
-            Statements::Return(s) => {
-                format!("{};", s.token.literal)
-            }
+            Statements::Let(s) => format!(
+                "{} {} = {};",
+                s.token_literal(),
+                s.name.token_literal(),
+                s.value.to_string()
+            ),
+            Statements::Return(s) => format!("{};", s.token.literal),
         }
     }
 }
@@ -68,7 +64,7 @@ impl Statements {
 impl Expressions {
     fn to_string(&self) -> String {
         match &self {
-            Expressions::Identifier(v) => v.value.clone()
+            Expressions::Identifier(v) => v.value.clone(),
         }
     }
 }

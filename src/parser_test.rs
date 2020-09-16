@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use crate::parser::*;
-    use crate::{lexer, ast};
+    use crate::{ast, lexer};
 
     #[test]
     fn test_let_statement() {
@@ -29,7 +29,7 @@ mod tests {
                     s.name.value == val;
                     s.name.token_literal() == val;
                 }
-                _ => unreachable!()
+                _ => unreachable!(),
             }
         }
     }
@@ -51,8 +51,8 @@ mod tests {
 
         for statement in program.statements.iter() {
             match statement {
-                ast::Statements::Return(_) => {},
-                _ => unreachable!()
+                ast::Statements::Return(_) => {}
+                _ => unreachable!(),
             }
         }
     }

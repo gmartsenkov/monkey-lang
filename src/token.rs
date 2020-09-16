@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use lazy_static::lazy_static;
+use std::collections::HashMap;
 
 pub const ILLEGAL: &str = "ILLEGAL";
 pub const EOF: &str = "EOF";
@@ -41,7 +41,7 @@ pub const FALSE: &str = "FALSE";
 pub type Type = String;
 
 lazy_static! {
-    static ref KEYWORDS : HashMap<&'static str, &'static str> = [
+    static ref KEYWORDS: HashMap<&'static str, &'static str> = [
         ("fn", FUNCTION),
         ("let", LET),
         ("true", TRUE),
@@ -49,20 +49,26 @@ lazy_static! {
         ("if", IF),
         ("else", ELSE),
         ("return", RETURN)
-    ].iter().cloned().collect();
+    ]
+    .iter()
+    .cloned()
+    .collect();
 }
 
 #[derive(Debug, Clone)]
 pub struct Token {
-    pub token_type : Type,
-    pub literal : String,
+    pub token_type: Type,
+    pub literal: String,
 }
 
-pub fn new(token_type : &str, literal : String) -> Token {
-    Token{token_type: token_type.to_string(), literal}
+pub fn new(token_type: &str, literal: String) -> Token {
+    Token {
+        token_type: token_type.to_string(),
+        literal,
+    }
 }
 
-pub fn lookup_identifier(identifier : &str) -> &str {
+pub fn lookup_identifier(identifier: &str) -> &str {
     if let Some(v) = KEYWORDS.get(identifier) {
         return v;
     }

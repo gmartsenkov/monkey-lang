@@ -1,8 +1,8 @@
+use crate::{lexer, token};
 use std::io;
 use std::io::BufRead;
-use crate::{lexer, token};
 
-pub fn start<R : io::Read, W : io::Write>(io_read : R, io_write : &mut W) {
+pub fn start<R: io::Read, W: io::Write>(io_read: R, io_write: &mut W) {
     let mut input = String::new();
     let mut buf = std::io::BufReader::new(io_read);
 
@@ -31,7 +31,7 @@ mod tests {
     #[test]
     fn test_start() {
         let read = "5 * 5 = 10;".as_bytes();
-        let mut output : Vec<u8> = vec![];
+        let mut output: Vec<u8> = vec![];
 
         start(read, &mut output);
 

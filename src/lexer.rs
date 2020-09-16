@@ -4,11 +4,16 @@ pub struct Lexer {
     input: String,
     position: usize,
     read_position: usize,
-    ch: char
+    ch: char,
 }
 
 pub fn new(input: String) -> Lexer {
-    let mut lex = Lexer{input, position: 0, read_position: 0, ch: '0'};
+    let mut lex = Lexer {
+        input,
+        position: 0,
+        read_position: 0,
+        ch: '0',
+    };
     lex.read_char();
     lex
 }
@@ -26,7 +31,7 @@ impl Lexer {
                 } else {
                     token::new(token::ASSIGN, self.ch.to_string())
                 }
-            },
+            }
             '!' => {
                 if self.peek_ahead() == '=' {
                     let ch = self.ch;
@@ -35,7 +40,7 @@ impl Lexer {
                 } else {
                     token::new(token::BANG, self.ch.to_string())
                 }
-            },
+            }
             ';' => token::new(token::SEMICOLON, self.ch.to_string()),
             '(' => token::new(token::LPAREN, self.ch.to_string()),
             ')' => token::new(token::RPAREN, self.ch.to_string()),
@@ -111,10 +116,10 @@ impl Lexer {
     }
 }
 
-fn is_letter(ch : char) -> bool {
+fn is_letter(ch: char) -> bool {
     ch.is_ascii_alphabetic() || ch == '_'
 }
 
-fn is_digit(ch : char) -> bool {
+fn is_digit(ch: char) -> bool {
     ch.is_ascii_digit()
 }
