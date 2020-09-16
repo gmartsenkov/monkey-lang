@@ -56,4 +56,28 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn text_identifier_expression() {
+        let input = "foobar;";
+        let mut lexer = lexer::new(input.to_string());
+        let mut parser = new(&mut lexer);
+
+        let program = parser.parse_program();
+
+        assert_eq!(program.statements.len(), 1);
+
+        for statement in program.statements.iter() {
+            match statement {
+                ast::Statements::Expression(i) => match &i.expression {
+                    ast::Expressions::Identifier(e) => {
+                        assert_eq!(e.value, "foobar");
+                        assert_eq!(e.token_literal(), "foobar");
+                    }
+                    _ => unreachable!(),
+                },
+                _ => unreachable!(),
+            }
+        }
+    }
 }
