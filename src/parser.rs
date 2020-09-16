@@ -1,10 +1,16 @@
 use crate::{ast, lexer, token};
+use std::collections::HashMap;
+
+type PrefixParseFn = fn() -> ast::Expressions;
+type InfixParseFn = fn(ast::Expressions) -> ast::Expressions;
 
 pub struct Parser<'a> {
     lexer: &'a mut lexer::Lexer,
     current_token: token::Token,
     peek_token: token::Token,
     errors: Vec<String>,
+    prefix_parse_functions: HashMap<token::Type, PrefixParseFn>,
+    infix_parse_functions: HashMap<token::Type, InfixParseFn>,
 }
 
 pub fn new(lexer: &mut lexer::Lexer) -> Parser {
@@ -13,6 +19,8 @@ pub fn new(lexer: &mut lexer::Lexer) -> Parser {
         current_token: token::new(token::NULL, "".to_string()),
         peek_token: token::new(token::NULL, "".to_string()),
         errors: vec![],
+        prefix_parse_functions: HashMap::new(),
+        infix_parse_functions: HashMap::new(),
     };
 
     parser.next_token();
@@ -86,6 +94,14 @@ impl Parser<'_> {
         }
 
         Some(ast::Statements::Return(statement))
+    }
+
+    fn register_prefix_fn(&mut self, token_type: token::Type, function: PrefixParseFn) {
+        self.prefix_parse_functions.insert(token_type, function).unwrap();
+    }
+
+    fn register_infix_fn(&mut self, token_type: token::Type, function: InfixParseFn) {
+        self.infix_parse_functions.insert(token_type, function).unwrap();
     }
 
     fn next_token(&mut self) {
