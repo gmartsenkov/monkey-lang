@@ -64,10 +64,16 @@ impl Parser<'_> {
             self.next_token();
         }
 
-        Some(ast::Statements::LetStatement(
+        Some(ast::Statements::Let(
             ast::LetStatement{
                 token: current_token,
-                name: identifier
+                name: identifier,
+                value: ast::Expressions::Identifier(
+                    ast::Identifier{
+                        token: token::new(token::IDENT, "".to_string()),
+                        value: "".to_string()
+                    }
+                )
             }
         ))
     }
@@ -83,7 +89,7 @@ impl Parser<'_> {
             self.next_token();
         }
 
-        Some(ast::Statements::ReturnStatement(statement))
+        Some(ast::Statements::Return(statement))
     }
 
     fn next_token(&mut self) {

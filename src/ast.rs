@@ -1,12 +1,12 @@
 use crate::token;
 
 pub enum Statements {
-    LetStatement(LetStatement),
-    ReturnStatement(ReturnStatement)
+    Let(LetStatement),
+    Return(ReturnStatement)
 }
 
 pub enum Expressions {
-    Idedntifier(Identifier)
+    Identifier(Identifier)
 }
 
 pub struct Program {
@@ -21,7 +21,7 @@ pub struct Identifier {
 pub struct LetStatement {
     pub token : token::Token,
     pub name : Identifier,
-    // pub value : Expressions
+    pub value : Expressions
 }
 
 pub struct ReturnStatement {
@@ -44,8 +44,31 @@ impl Identifier {
 impl Statements {
     pub fn token_literal(&self) -> &str {
         match self {
-            Statements::LetStatement(i) => i.token.literal.as_str(),
-            Statements::ReturnStatement(i) => i.token.literal.as_str()
+            Statements::Let(i) => i.token.literal.as_str(),
+            Statements::Return(i) => i.token.literal.as_str()
+        }
+    }
+    pub fn to_string(&self) -> String {
+        match self {
+            Statements::Let(s) => {
+                format!(
+                    "{} {} = {};",
+                    s.token_literal(),
+                    s.name.token_literal(),
+                    s.value.to_string()
+                )
+            },
+            Statements::Return(s) => {
+                format!("{};", s.token.literal)
+            }
+        }
+    }
+}
+
+impl Expressions {
+    fn to_string(&self) -> String {
+        match &self {
+            Expressions::Identifier(v) => v.value.clone()
         }
     }
 }
@@ -56,5 +79,15 @@ impl Program {
             return self.statements[0].token_literal();
         }
         ""
+    }
+
+    pub fn to_string(&self) -> String {
+        let mut output = String::new();
+
+        for statement in &self.statements {
+            output.push_str(&statement.to_string().clone());
+        }
+
+        output
     }
 }

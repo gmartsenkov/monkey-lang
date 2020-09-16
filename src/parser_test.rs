@@ -25,7 +25,7 @@ mod tests {
             assert_eq!(statement.token_literal(), "let");
 
             match statement {
-                ast::Statements::LetStatement(s) => {
+                ast::Statements::Let(s) => {
                     s.name.value == val;
                     s.name.token_literal() == val;
                 }
@@ -51,7 +51,7 @@ mod tests {
 
         for statement in program.statements.iter() {
             match statement {
-                ast::Statements::ReturnStatement(_) => {},
+                ast::Statements::Return(_) => {},
                 _ => unreachable!()
             }
         }
