@@ -112,4 +112,37 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn test_prefix_operator() {
+        let tests = [("!5", "!", 5), ("-15", "-", 15)];
+
+        for &test in tests.iter() {
+            let input = test.0;
+            let mut lexer = lexer::new(input.to_string());
+            let mut parser = new(&mut lexer);
+
+            let program = parser.parse_program();
+
+            assert_eq!(program.statements.len(), 1);
+
+            for statement in program.statements.iter() {
+                match statement {
+                    ast::Statements::Expression(i) => match &i.expression {
+                        ast::Expressions::Prefix(e) => {
+                            assert_eq!(e.operator, test.1);
+                            match &*e.right {
+                                ast::Expressions::IntegerLiteral(i) => {
+                                    assert_eq!(i.value, test.2);
+                                }
+                                _ => unreachable!(),
+                            }
+                        }
+                        _ => unreachable!(),
+                    },
+                    _ => unreachable!(),
+                }
+            }
+        }
+    }
 }

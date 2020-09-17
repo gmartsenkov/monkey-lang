@@ -9,6 +9,7 @@ pub enum Statements {
 pub enum Expressions {
     Identifier(Identifier),
     IntegerLiteral(IntegerLiteral),
+    Prefix(PrefixExpression),
 }
 
 pub struct Program {
@@ -41,6 +42,12 @@ pub struct ExpressionStatement {
     pub expression: Expressions,
 }
 
+pub struct PrefixExpression {
+    pub token: token::Token,
+    pub operator: String,
+    pub right: Box<Expressions>,
+}
+
 impl LetStatement {
     fn token_literal(&self) -> &str {
         self.token.literal.as_str()
@@ -54,6 +61,12 @@ impl Identifier {
 }
 
 impl IntegerLiteral {
+    pub fn token_literal(&self) -> &str {
+        self.token.literal.as_str()
+    }
+}
+
+impl PrefixExpression {
     pub fn token_literal(&self) -> &str {
         self.token.literal.as_str()
     }
@@ -87,6 +100,7 @@ impl Expressions {
         match &self {
             Expressions::Identifier(v) => v.value.clone(),
             Expressions::IntegerLiteral(v) => v.value.to_string().clone(),
+            Expressions::Prefix(v) => format!("({}{})", v.operator, v.right.to_string()),
         }
     }
 }
