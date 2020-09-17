@@ -10,7 +10,7 @@ pub enum Expressions {
     Identifier(Identifier),
     IntegerLiteral(IntegerLiteral),
     Prefix(PrefixExpression),
-    Infix(InfixExpression)
+    Infix(InfixExpression),
 }
 
 pub struct Program {
@@ -53,7 +53,7 @@ pub struct InfixExpression {
     pub token: token::Token,
     pub left: Box<Expressions>,
     pub operator: String,
-    pub right: Box<Expressions>
+    pub right: Box<Expressions>,
 }
 
 impl LetStatement {
@@ -109,7 +109,12 @@ impl Expressions {
             Expressions::Identifier(v) => v.value.clone(),
             Expressions::IntegerLiteral(v) => v.value.to_string().clone(),
             Expressions::Prefix(v) => format!("({}{})", v.operator, v.right.to_string()),
-            Expressions::Infix(v) => format!("({} {} {})", v.left.to_string(), v.operator, v.right.to_string()),
+            Expressions::Infix(v) => format!(
+                "({} {} {})",
+                v.left.to_string(),
+                v.operator,
+                v.right.to_string()
+            ),
         }
     }
 }

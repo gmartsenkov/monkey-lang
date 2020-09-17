@@ -1,6 +1,6 @@
 use crate::{ast, lexer, token};
-use std::collections::HashMap;
 use lazy_static::lazy_static;
+use std::collections::HashMap;
 
 const LOWEST: u8 = 1;
 const EQUALS: u8 = 2; // ==
@@ -13,7 +13,7 @@ const CALL: u8 = 7; // myFunction(x)
 type PrefixParseFn = fn(&mut Parser) -> Option<ast::Expressions>;
 type InfixParseFn = fn(ast::Expressions, &mut Parser) -> Option<ast::Expressions>;
 
-lazy_static!{
+lazy_static! {
     static ref PRECEDENTS: HashMap<token::Type, u8> = {
         let mut m: HashMap<token::Type, u8> = HashMap::new();
         m.insert(token::EQ.to_string(), EQUALS);
@@ -102,7 +102,7 @@ fn parse_prefix_expression(parser: &mut Parser) -> Option<ast::Expressions> {
     None
 }
 
-fn parse_infix_expression(left : ast::Expressions, parser: &mut Parser) -> Option<ast::Expressions> {
+fn parse_infix_expression(left: ast::Expressions, parser: &mut Parser) -> Option<ast::Expressions> {
     let current_token = parser.current_token.clone();
 
     let precedence = parser.current_precedence();
@@ -110,12 +110,12 @@ fn parse_infix_expression(left : ast::Expressions, parser: &mut Parser) -> Optio
     parser.next_token();
 
     if let Some(right) = parser.parse_expression(precedence) {
-        return Some(ast::Expressions::Infix(ast::InfixExpression{
+        return Some(ast::Expressions::Infix(ast::InfixExpression {
             token: current_token.clone(),
             operator: current_token.literal,
             left: Box::new(left),
-            right: Box::new(right)
-        }))
+            right: Box::new(right),
+        }));
     }
 
     None
@@ -212,14 +212,16 @@ impl Parser<'_> {
         if let Some(prefix) = self.prefix_parse_functions.get(token_type) {
             let mut left_expresion = prefix(self);
 
-            while self.peek_token.token_type != token::SEMICOLON && precedence < self.peek_precedence() {
+            while self.peek_token.token_type != token::SEMICOLON
+                && precedence < self.peek_precedence()
+            {
                 if let Some(&inflix) = self.infix_parse_functions.get(&self.peek_token.token_type) {
                     self.next_token();
 
                     left_expresion = inflix(left_expresion.unwrap(), self);
                 }
             }
-            return left_expresion
+            return left_expresion;
         }
 
         let error = format!(

@@ -174,19 +174,53 @@ mod tests {
                         ast::Expressions::Infix(i) => {
                             match &*i.left {
                                 ast::Expressions::IntegerLiteral(l) => assert_eq!(l.value, test.1),
-                                _ => unreachable!()
+                                _ => unreachable!(),
                             }
                             assert_eq!(i.operator, test.2);
                             match &*i.right {
                                 ast::Expressions::IntegerLiteral(l) => assert_eq!(l.value, test.1),
-                                _ => unreachable!()
+                                _ => unreachable!(),
                             }
-                        },
+                        }
                         _ => unreachable!(),
                     },
                     _ => unreachable!(),
                 }
             }
+        }
+    }
+
+    #[test]
+    fn test_precedence_parsing() {
+        let tests = [
+            ("-a * b", "((-a) * b)"),
+            ("!-a", "(!(-a))"),
+            ("a + b + c", "((a + b) + c)"),
+            ("a + b - c", "((a + b) - c)"),
+            ("a * b * c", "((a * b) * c)"),
+            ("a * b / c", "((a * b) / c)"),
+            ("a + b * c + d / e - f", "(((a + (b * c)) + (d / e)) - f)"),
+            ("3 + 4; -5 * 5", "(3 + 4)((-5) * 5)"),
+            ("5 > 4 == 3 < 4", "((5 > 4) == (3 < 4))"),
+            ("5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"),
+            (
+                "3 + 4 * 5 == 3 * 1 + 4 * 5",
+                "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))",
+            ),
+            (
+                "3 + 4 * 5 == 3 * 1 + 4 * 5",
+                "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))",
+            ),
+        ];
+
+        for &test in tests.iter() {
+            let input = test.0;
+            let mut lexer = lexer::new(input.to_string());
+            let mut parser = new(&mut lexer);
+
+            let program = parser.parse_program();
+
+            assert_eq!(program.to_string(), test.1);
         }
     }
 }
