@@ -115,7 +115,7 @@ mod tests {
 
     #[test]
     fn test_prefix_operator() {
-        let tests = [("!5", "!", 5), ("-15", "-", 15)];
+        let tests = [("!5;", "!", 5), ("-15;", "-", 15)];
 
         for &test in tests.iter() {
             let input = test.0;
@@ -138,6 +138,50 @@ mod tests {
                                 _ => unreachable!(),
                             }
                         }
+                        _ => unreachable!(),
+                    },
+                    _ => unreachable!(),
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn test_inflix_parsing() {
+        let tests = [
+            ("5 + 5;", 5, "+", 5),
+            ("5 - 5;", 5, "-", 5),
+            ("5 * 5;", 5, "*", 5),
+            ("5 / 5;", 5, "/", 5),
+            ("5 > 5;", 5, ">", 5),
+            ("5 < 5;", 5, "<", 5),
+            ("5 == 5;", 5, "==", 5),
+            ("5 != 5;", 5, "!=", 5),
+        ];
+
+        for &test in tests.iter() {
+            let input = test.0;
+            let mut lexer = lexer::new(input.to_string());
+            let mut parser = new(&mut lexer);
+
+            let program = parser.parse_program();
+
+            assert_eq!(program.statements.len(), 1);
+
+            for statement in program.statements.iter() {
+                match statement {
+                    ast::Statements::Expression(e) => match &e.expression {
+                        ast::Expressions::Infix(i) => {
+                            match &*i.left {
+                                ast::Expressions::IntegerLiteral(l) => assert_eq!(l.value, test.1),
+                                _ => unreachable!()
+                            }
+                            assert_eq!(i.operator, test.2);
+                            match &*i.right {
+                                ast::Expressions::IntegerLiteral(l) => assert_eq!(l.value, test.1),
+                                _ => unreachable!()
+                            }
+                        },
                         _ => unreachable!(),
                     },
                     _ => unreachable!(),

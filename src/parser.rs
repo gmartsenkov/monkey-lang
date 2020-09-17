@@ -1,5 +1,6 @@
 use crate::{ast, lexer, token};
 use std::collections::HashMap;
+use lazy_static::lazy_static;
 
 const LOWEST: u8 = 1;
 const EQUALS: u8 = 2; // ==
@@ -10,7 +11,22 @@ const PREFIX: u8 = 6; // -X or !X
 const CALL: u8 = 7; // myFunction(x)
 
 type PrefixParseFn = fn(&mut Parser) -> Option<ast::Expressions>;
-type InfixParseFn = fn(ast::Expressions) -> ast::Expressions;
+type InfixParseFn = fn(ast::Expressions, &mut Parser) -> Option<ast::Expressions>;
+
+lazy_static!{
+    static ref PRECEDENTS: HashMap<token::Type, u8> = {
+        let mut m: HashMap<token::Type, u8> = HashMap::new();
+        m.insert(token::EQ.to_string(), EQUALS);
+        m.insert(token::NOT_EQ.to_string(), EQUALS);
+        m.insert(token::LT.to_string(), LESSGREATER);
+        m.insert(token::GT.to_string(), LESSGREATER);
+        m.insert(token::PLUS.to_string(), SUM);
+        m.insert(token::MINUS.to_string(), SUM);
+        m.insert(token::SLASH.to_string(), PRODUCT);
+        m.insert(token::ASTERISK.to_string(), PRODUCT);
+        m
+    };
+}
 
 pub struct Parser<'a> {
     lexer: &'a mut lexer::Lexer,
@@ -35,6 +51,16 @@ pub fn new(lexer: &mut lexer::Lexer) -> Parser {
     parser.register_prefix_fn(token::INT.to_string(), parse_integer_literal);
     parser.register_prefix_fn(token::MINUS.to_string(), parse_prefix_expression);
     parser.register_prefix_fn(token::BANG.to_string(), parse_prefix_expression);
+
+    parser.register_infix_fn(token::PLUS.to_string(), parse_infix_expression);
+    parser.register_infix_fn(token::MINUS.to_string(), parse_infix_expression);
+    parser.register_infix_fn(token::SLASH.to_string(), parse_infix_expression);
+    parser.register_infix_fn(token::ASTERISK.to_string(), parse_infix_expression);
+    parser.register_infix_fn(token::EQ.to_string(), parse_infix_expression);
+    parser.register_infix_fn(token::NOT_EQ.to_string(), parse_infix_expression);
+    parser.register_infix_fn(token::LT.to_string(), parse_infix_expression);
+    parser.register_infix_fn(token::GT.to_string(), parse_infix_expression);
+
     parser.next_token();
     parser.next_token();
 
@@ -71,6 +97,25 @@ fn parse_prefix_expression(parser: &mut Parser) -> Option<ast::Expressions> {
             operator: current_token.literal,
             right: Box::new(e),
         }));
+    }
+
+    None
+}
+
+fn parse_infix_expression(left : ast::Expressions, parser: &mut Parser) -> Option<ast::Expressions> {
+    let current_token = parser.current_token.clone();
+
+    let precedence = parser.current_precedence();
+
+    parser.next_token();
+
+    if let Some(right) = parser.parse_expression(precedence) {
+        return Some(ast::Expressions::Infix(ast::InfixExpression{
+            token: current_token.clone(),
+            operator: current_token.literal,
+            left: Box::new(left),
+            right: Box::new(right)
+        }))
     }
 
     None
@@ -165,7 +210,16 @@ impl Parser<'_> {
     fn parse_expression(&mut self, precedence: u8) -> Option<ast::Expressions> {
         let token_type = &self.current_token.token_type;
         if let Some(prefix) = self.prefix_parse_functions.get(token_type) {
-            return prefix(self);
+            let mut left_expresion = prefix(self);
+
+            while self.peek_token.token_type != token::SEMICOLON && precedence < self.peek_precedence() {
+                if let Some(&inflix) = self.infix_parse_functions.get(&self.peek_token.token_type) {
+                    self.next_token();
+
+                    left_expresion = inflix(left_expresion.unwrap(), self);
+                }
+            }
+            return left_expresion
         }
 
         let error = format!(
@@ -195,6 +249,20 @@ impl Parser<'_> {
     fn next_token(&mut self) {
         self.current_token = self.peek_token.clone();
         self.peek_token = self.lexer.next_token().clone();
+    }
+
+    fn peek_precedence(&self) -> u8 {
+        if let Some(&precendence) = PRECEDENTS.get(&self.peek_token.token_type) {
+            return precendence;
+        }
+        LOWEST
+    }
+
+    fn current_precedence(&self) -> u8 {
+        if let Some(&precendence) = PRECEDENTS.get(&self.current_token.token_type) {
+            return precendence;
+        }
+        LOWEST
     }
 
     fn expect_peek_token(&mut self, expected: token::Type) -> bool {
