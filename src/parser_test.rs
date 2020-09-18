@@ -76,16 +76,10 @@ mod tests {
         assert_eq!(program.statements.len(), 1);
 
         for statement in program.statements.iter() {
-            match statement {
-                ast::Statements::Expression(i) => match &i.expression {
-                    ast::Expressions::Identifier(e) => {
-                        assert_eq!(e.value, "foobar");
-                        assert_eq!(e.token_literal(), "foobar");
-                    }
-                    _ => unreachable!(),
-                },
-                _ => unreachable!(),
-            }
+            let identifier = statement.expression().identifier();
+
+            assert_eq!(identifier.value, "foobar");
+            assert_eq!(identifier.token_literal(), "foobar");
         }
     }
 
@@ -100,16 +94,10 @@ mod tests {
         assert_eq!(program.statements.len(), 1);
 
         for statement in program.statements.iter() {
-            match statement {
-                ast::Statements::Expression(i) => match &i.expression {
-                    ast::Expressions::IntegerLiteral(e) => {
-                        assert_eq!(e.value, 5);
-                        assert_eq!(e.token_literal(), "5");
-                    }
-                    _ => unreachable!(),
-                },
-                _ => unreachable!(),
-            }
+            let integer_literal = statement.expression().integer_literal();
+
+            assert_eq!(integer_literal.value, 5);
+            assert_eq!(integer_literal.token_literal(), "5");
         }
     }
 
@@ -127,21 +115,10 @@ mod tests {
             assert_eq!(program.statements.len(), 1);
 
             for statement in program.statements.iter() {
-                match statement {
-                    ast::Statements::Expression(i) => match &i.expression {
-                        ast::Expressions::Prefix(e) => {
-                            assert_eq!(e.operator, test.1);
-                            match &*e.right {
-                                ast::Expressions::IntegerLiteral(i) => {
-                                    assert_eq!(i.value, test.2);
-                                }
-                                _ => unreachable!(),
-                            }
-                        }
-                        _ => unreachable!(),
-                    },
-                    _ => unreachable!(),
-                }
+                let prefix = statement.expression().prefix();
+
+                assert_eq!(prefix.operator, test.1);
+                assert_eq!(prefix.right.integer_literal().value, test.2);
             }
         }
     }
@@ -152,7 +129,7 @@ mod tests {
             ("5 + 5;", 5, "+", 5),
             ("5 - 5;", 5, "-", 5),
             ("5 * 5;", 5, "*", 5),
-            ("5 / 5;", 5, "/", 5),
+            ("5 / 15;", 5, "/", 15),
             ("5 > 5;", 5, ">", 5),
             ("5 < 5;", 5, "<", 5),
             ("5 == 5;", 5, "==", 5),
@@ -169,23 +146,11 @@ mod tests {
             assert_eq!(program.statements.len(), 1);
 
             for statement in program.statements.iter() {
-                match statement {
-                    ast::Statements::Expression(e) => match &e.expression {
-                        ast::Expressions::Infix(i) => {
-                            match &*i.left {
-                                ast::Expressions::IntegerLiteral(l) => assert_eq!(l.value, test.1),
-                                _ => unreachable!(),
-                            }
-                            assert_eq!(i.operator, test.2);
-                            match &*i.right {
-                                ast::Expressions::IntegerLiteral(l) => assert_eq!(l.value, test.1),
-                                _ => unreachable!(),
-                            }
-                        }
-                        _ => unreachable!(),
-                    },
-                    _ => unreachable!(),
-                }
+                let infix = statement.expression().infix();
+
+                assert_eq!(infix.left.integer_literal().value, test.1);
+                assert_eq!(infix.operator, test.2);
+                assert_eq!(infix.right.integer_literal().value, test.3);
             }
         }
     }

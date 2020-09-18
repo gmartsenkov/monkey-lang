@@ -101,6 +101,13 @@ impl Statements {
             Statements::Expression(s) => format!("{}", s.expression.to_string()),
         }
     }
+
+    pub fn expression(&self) -> &Expressions {
+        match self {
+            Statements::Expression(e) => &e.expression,
+            _ => panic!("Not an expression.")
+        }
+    }
 }
 
 impl Expressions {
@@ -115,6 +122,34 @@ impl Expressions {
                 v.operator,
                 v.right.to_string()
             ),
+        }
+    }
+
+    pub fn identifier(&self) -> &Identifier {
+        match self {
+            Expressions::Identifier(i) => &i,
+            _ => panic!("Not an identifier expression.")
+        }
+    }
+
+    pub fn integer_literal(&self) -> &IntegerLiteral {
+        match self {
+            Expressions::IntegerLiteral(i) => &i,
+            _ => panic!("Not an integer literal expression.")
+        }
+    }
+
+    pub fn prefix(&self) -> &PrefixExpression {
+        match self {
+            Expressions::Prefix(p) => &p,
+            _ => panic!("Not an prefix expression.")
+        }
+    }
+
+    pub fn infix(&self) -> &InfixExpression {
+        match self {
+            Expressions::Infix(i) => &i,
+            _ => panic!("Not an infix expression.")
         }
     }
 }
