@@ -51,6 +51,8 @@ pub fn new(lexer: &mut lexer::Lexer) -> Parser {
     parser.register_prefix_fn(token::INT.to_string(), parse_integer_literal);
     parser.register_prefix_fn(token::MINUS.to_string(), parse_prefix_expression);
     parser.register_prefix_fn(token::BANG.to_string(), parse_prefix_expression);
+    parser.register_prefix_fn(token::TRUE.to_string(), parse_boolean_expression);
+    parser.register_prefix_fn(token::FALSE.to_string(), parse_boolean_expression);
 
     parser.register_infix_fn(token::PLUS.to_string(), parse_infix_expression);
     parser.register_infix_fn(token::MINUS.to_string(), parse_infix_expression);
@@ -82,6 +84,13 @@ fn parse_integer_literal(parser: &mut Parser) -> Option<ast::Expressions> {
         }));
     }
     None
+}
+
+fn parse_boolean_expression(parser: &mut Parser) -> Option<ast::Expressions> {
+    Some(ast::Expressions::Boolean(ast::Boolean {
+        token: parser.current_token.clone(),
+        value: parser.current_token.token_type == token::TRUE,
+    }))
 }
 
 fn parse_prefix_expression(parser: &mut Parser) -> Option<ast::Expressions> {

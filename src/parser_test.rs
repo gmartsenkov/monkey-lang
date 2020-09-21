@@ -124,6 +124,27 @@ mod tests {
     }
 
     #[test]
+    fn test_prefix_operator_with_bool() {
+        let tests = [("!true;", "!", true), ("!false;", "!", false)];
+
+        for &test in tests.iter() {
+            let input = test.0;
+            let mut lexer = lexer::new(input.to_string());
+            let mut parser = new(&mut lexer);
+
+            let program = parser.parse_program();
+
+            assert_eq!(program.statements.len(), 1);
+
+            for statement in program.statements.iter() {
+                let prefix = statement.expression().prefix();
+
+                assert_eq!(prefix.operator, test.1);
+                assert_eq!(prefix.right.boolean().value, test.2);
+            }
+        }
+    }
+    #[test]
     fn test_inflix_parsing() {
         let tests = [
             ("5 + 5;", 5, "+", 5),
@@ -156,6 +177,33 @@ mod tests {
     }
 
     #[test]
+    fn test_inflix_boolean_parsing() {
+        let tests = [
+            ("true == true", true, "==", true),
+            ("true != false", true, "!=", false),
+            ("false == false", false, "==", false),
+        ];
+
+        for &test in tests.iter() {
+            let input = test.0;
+            let mut lexer = lexer::new(input.to_string());
+            let mut parser = new(&mut lexer);
+
+            let program = parser.parse_program();
+
+            assert_eq!(program.statements.len(), 1);
+
+            for statement in program.statements.iter() {
+                let infix = statement.expression().infix();
+
+                assert_eq!(infix.left.boolean().value, test.1);
+                assert_eq!(infix.operator, test.2);
+                assert_eq!(infix.right.boolean().value, test.3);
+            }
+        }
+    }
+
+    #[test]
     fn test_precedence_parsing() {
         let tests = [
             ("-a * b", "((-a) * b)"),
@@ -176,6 +224,10 @@ mod tests {
                 "3 + 4 * 5 == 3 * 1 + 4 * 5",
                 "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))",
             ),
+            ("true", "true"),
+            ("false", "false"),
+            ("3 > 5 == false", "((3 > 5) == false)"),
+            ("3 < 5 == true", "((3 < 5) == true)"),
         ];
 
         for &test in tests.iter() {
@@ -187,5 +239,29 @@ mod tests {
 
             assert_eq!(program.to_string(), test.1);
         }
+    }
+
+    #[test]
+    fn test_boolean_parsing() {
+        let input = r#"
+          true;
+          false;
+          let foobar = true;
+          let barfoo = false;
+        "#;
+
+        let mut lexer = lexer::new(input.to_string());
+        let mut parser = new(&mut lexer);
+
+        let program = parser.parse_program();
+
+        assert_eq!(program.statements.len(), 6);
+
+        assert_eq!(program.statements[0].expression().boolean().value, true);
+        assert_eq!(program.statements[1].expression().boolean().value, false);
+        assert_eq!(program.statements[2].let_statement().name.value, "foobar");
+        assert_eq!(program.statements[3].expression().boolean().value, true);
+        assert_eq!(program.statements[4].let_statement().name.value, "barfoo");
+        assert_eq!(program.statements[5].expression().boolean().value, false);
     }
 }

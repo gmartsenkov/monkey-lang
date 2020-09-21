@@ -11,6 +11,7 @@ pub enum Expressions {
     IntegerLiteral(IntegerLiteral),
     Prefix(PrefixExpression),
     Infix(InfixExpression),
+    Boolean(Boolean),
 }
 
 pub struct Program {
@@ -31,6 +32,11 @@ pub struct LetStatement {
 pub struct ReturnStatement {
     pub token: token::Token,
     // pub return_value : Expressions
+}
+
+pub struct Boolean {
+    pub token: token::Token,
+    pub value: bool,
 }
 
 pub struct IntegerLiteral {
@@ -105,7 +111,14 @@ impl Statements {
     pub fn expression(&self) -> &Expressions {
         match self {
             Statements::Expression(e) => &e.expression,
-            _ => panic!("Not an expression.")
+            _ => panic!("Not an expression."),
+        }
+    }
+
+    pub fn let_statement(&self) -> &LetStatement {
+        match self {
+            Statements::Let(l) => &l,
+            _ => panic!("Not a let statement."),
         }
     }
 }
@@ -115,6 +128,7 @@ impl Expressions {
         match &self {
             Expressions::Identifier(v) => v.value.clone(),
             Expressions::IntegerLiteral(v) => v.value.to_string().clone(),
+            Expressions::Boolean(v) => v.value.to_string().clone(),
             Expressions::Prefix(v) => format!("({}{})", v.operator, v.right.to_string()),
             Expressions::Infix(v) => format!(
                 "({} {} {})",
@@ -128,28 +142,35 @@ impl Expressions {
     pub fn identifier(&self) -> &Identifier {
         match self {
             Expressions::Identifier(i) => &i,
-            _ => panic!("Not an identifier expression.")
+            _ => panic!("Not an identifier expression."),
         }
     }
 
     pub fn integer_literal(&self) -> &IntegerLiteral {
         match self {
             Expressions::IntegerLiteral(i) => &i,
-            _ => panic!("Not an integer literal expression.")
+            _ => panic!("Not an integer literal expression."),
         }
     }
 
     pub fn prefix(&self) -> &PrefixExpression {
         match self {
             Expressions::Prefix(p) => &p,
-            _ => panic!("Not an prefix expression.")
+            _ => panic!("Not an prefix expression."),
         }
     }
 
     pub fn infix(&self) -> &InfixExpression {
         match self {
             Expressions::Infix(i) => &i,
-            _ => panic!("Not an infix expression.")
+            _ => panic!("Not an infix expression."),
+        }
+    }
+
+    pub fn boolean(&self) -> &Boolean {
+        match self {
+            Expressions::Boolean(b) => &b,
+            _ => panic!("Not an infix expression."),
         }
     }
 }
