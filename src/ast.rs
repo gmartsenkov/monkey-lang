@@ -12,6 +12,7 @@ pub enum Expressions {
     Prefix(PrefixExpression),
     Infix(InfixExpression),
     Boolean(Boolean),
+    If(IfStatement),
 }
 
 pub struct Program {
@@ -62,6 +63,18 @@ pub struct InfixExpression {
     pub right: Box<Expressions>,
 }
 
+pub struct IfStatement {
+    pub token: token::Token,
+    pub condition: Box<Expressions>,
+    pub consequence: BlockStatement,
+    pub alternative: Option<BlockStatement>,
+}
+
+pub struct BlockStatement {
+    pub token: token::Token,
+    pub statements: Vec<Statements>,
+}
+
 impl LetStatement {
     fn token_literal(&self) -> &str {
         self.token.literal.as_str()
@@ -86,6 +99,32 @@ impl PrefixExpression {
     }
 }
 
+impl IfStatement {
+    fn to_string(&self) -> String {
+        let mut output = format!(
+            "if {} {}",
+            self.condition.to_string(),
+            self.consequence.to_string()
+        );
+
+        if let Some(alternative) = &self.alternative {
+            output += format!("else {}", alternative.to_string()).as_str();
+        }
+        output
+    }
+}
+
+impl BlockStatement {
+    fn to_string(&self) -> String {
+        let mut output = String::new();
+
+        for statement in &self.statements {
+            output += statement.to_string().clone().as_str();
+        }
+
+        output
+    }
+}
 impl Statements {
     pub fn token_literal(&self) -> String {
         match self {
@@ -136,6 +175,7 @@ impl Expressions {
                 v.operator,
                 v.right.to_string()
             ),
+            Expressions::If(i) => i.to_string(),
         }
     }
 
@@ -171,6 +211,13 @@ impl Expressions {
         match self {
             Expressions::Boolean(b) => &b,
             _ => panic!("Not an infix expression."),
+        }
+    }
+
+    pub fn if_statement(&self) -> &IfStatement {
+        match self {
+            Expressions::If(i) => &i,
+            _ => panic!("Not an if statement"),
         }
     }
 }

@@ -54,6 +54,7 @@ pub fn new(lexer: &mut lexer::Lexer) -> Parser {
     parser.register_prefix_fn(token::TRUE.to_string(), parse_boolean_expression);
     parser.register_prefix_fn(token::FALSE.to_string(), parse_boolean_expression);
     parser.register_prefix_fn(token::LPAREN.to_string(), parse_grouped_expression);
+    parser.register_prefix_fn(token::IF.to_string(), parse_if_expression);
 
     parser.register_infix_fn(token::PLUS.to_string(), parse_infix_expression);
     parser.register_infix_fn(token::MINUS.to_string(), parse_infix_expression);
@@ -70,16 +71,60 @@ pub fn new(lexer: &mut lexer::Lexer) -> Parser {
     parser
 }
 
+fn parse_if_expression(parser: &mut Parser) -> Option<ast::Expressions> {
+    let token = parser.current_token.clone();
+
+    if !parser.expect_peek_token(token::LPAREN) {
+        return None;
+    }
+
+    parser.next_token();
+
+    let condition;
+
+    if let Some(i) = parser.parse_expression(LOWEST) {
+        condition = i;
+    } else {
+        return None;
+    };
+
+    if !parser.expect_peek_token(token::RPAREN) {
+        return None;
+    }
+
+    if !parser.expect_peek_token(token::LBRACE) {
+        return None;
+    }
+
+    let consequence = parser.parse_block_statement();
+    let mut alternative = None;
+
+    if parser.peek_token.token_type == token::ELSE {
+        parser.next_token();
+
+        if !parser.expect_peek_token(token::LBRACE) {
+            return None;
+        }
+
+        alternative = Some(parser.parse_block_statement());
+    }
+
+    Some(ast::Expressions::If(ast::IfStatement{
+        token,
+        condition: Box::new(condition),
+        consequence,
+        alternative
+    }))
+}
+
 fn parse_grouped_expression(parser: &mut Parser) -> Option<ast::Expressions> {
     parser.next_token();
 
     let expression = parser.parse_expression(LOWEST);
 
-    if parser.peek_token.token_type != token::RPAREN {
+    if !parser.expect_peek_token(token::RPAREN) {
         return None;
     }
-
-    parser.next_token();
 
     expression
 }
@@ -171,7 +216,7 @@ impl Parser<'_> {
     fn parse_let_statement(&mut self) -> Option<ast::Statements> {
         let current_token = self.current_token.clone();
 
-        if !self.expect_peek_token(token::IDENT.to_string()) {
+        if !self.expect_peek_token(token::IDENT) {
             return None;
         }
 
@@ -180,7 +225,7 @@ impl Parser<'_> {
             value: self.current_token.literal.clone(),
         };
 
-        if !self.expect_peek_token(token::ASSIGN.to_string()) {
+        if !self.expect_peek_token(token::ASSIGN) {
             return None;
         }
 
@@ -264,6 +309,21 @@ impl Parser<'_> {
         })
     }
 
+    fn parse_block_statement(&mut self) -> ast::BlockStatement {
+        let token = self.current_token.clone();
+        let mut statements = Vec::new();
+
+        while self.current_token.token_type != token::RBRACE && self.current_token.token_type != token::EOF {
+            if let Some(statement) = self.parse_statement() {
+                statements.push(statement);
+            }
+
+            self.next_token()
+        }
+
+        ast::BlockStatement{token, statements}
+    }
+
     fn register_prefix_fn(&mut self, token_type: token::Type, function: PrefixParseFn) {
         self.prefix_parse_functions.insert(token_type, function);
     }
@@ -291,8 +351,8 @@ impl Parser<'_> {
         LOWEST
     }
 
-    fn expect_peek_token(&mut self, expected: token::Type) -> bool {
-        if self.peek_token.token_type == expected {
+    fn expect_peek_token(&mut self, expected: &str) -> bool {
+        if self.peek_token.token_type == expected.to_string() {
             self.next_token();
             return true;
         }
