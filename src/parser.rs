@@ -53,6 +53,7 @@ pub fn new(lexer: &mut lexer::Lexer) -> Parser {
     parser.register_prefix_fn(token::BANG.to_string(), parse_prefix_expression);
     parser.register_prefix_fn(token::TRUE.to_string(), parse_boolean_expression);
     parser.register_prefix_fn(token::FALSE.to_string(), parse_boolean_expression);
+    parser.register_prefix_fn(token::LPAREN.to_string(), parse_grouped_expression);
 
     parser.register_infix_fn(token::PLUS.to_string(), parse_infix_expression);
     parser.register_infix_fn(token::MINUS.to_string(), parse_infix_expression);
@@ -67,6 +68,20 @@ pub fn new(lexer: &mut lexer::Lexer) -> Parser {
     parser.next_token();
 
     parser
+}
+
+fn parse_grouped_expression(parser: &mut Parser) -> Option<ast::Expressions> {
+    parser.next_token();
+
+    let expression = parser.parse_expression(LOWEST);
+
+    if parser.peek_token.token_type != token::RPAREN {
+        return None;
+    }
+
+    parser.next_token();
+
+    expression
 }
 
 fn parse_identifier(parser: &mut Parser) -> Option<ast::Expressions> {
